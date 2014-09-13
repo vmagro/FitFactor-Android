@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
+import com.parse.ParseInstallation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
@@ -97,6 +98,9 @@ public class LoginFragment extends Fragment {
     }
 
     private void linkUser(final ParseUser user){
+        ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+        installation.put("userid", user);
+        installation.saveInBackground();
         if (!ParseFacebookUtils.isLinked(user)) {
             ParseFacebookUtils.link(user, getActivity(), new SaveCallback() {
                 @Override

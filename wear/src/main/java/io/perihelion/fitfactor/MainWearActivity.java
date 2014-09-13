@@ -25,6 +25,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 public class MainWearActivity extends Activity implements SensorEventListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
@@ -62,6 +63,11 @@ public class MainWearActivity extends Activity implements SensorEventListener, G
         mSensorManager.registerListener(this, mHeartRateSensor, SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this, mStepCountSensor, SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this, mStepDetectSensor, SensorManager.SENSOR_DELAY_NORMAL);
+
+        List<Sensor> sensors = mSensorManager.getSensorList(Sensor.TYPE_ALL);
+        for(Sensor s: sensors) {
+            Log.d(TAG, s.getName() + " " + s.getType() + " " + s.getStringType());
+        }
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
@@ -134,6 +140,7 @@ public class MainWearActivity extends Activity implements SensorEventListener, G
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            Log.d(TAG, json.toString());
 
             NodeApi.GetConnectedNodesResult nodes =
                     Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();

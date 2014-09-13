@@ -14,6 +14,7 @@ import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Wearable;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
+import com.parse.ParseUser;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -111,6 +112,7 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
             ParseObject stepCountUpdate = new ParseObject("StepCountUpdate");
             stepCountUpdate.put("value", jsonObject.getString("value"));
             stepCountUpdate.put("sensor", jsonObject.getString("sensor"));
+            stepCountUpdate.put("user", ParseUser.getCurrentUser());
             stepCountUpdate.saveInBackground();
 
             Log.d(TAG, jsonObject.toString());
