@@ -1,6 +1,6 @@
 package io.perihelion.fitfactor.Fragments;
 
-import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.Fragment;
 import android.graphics.drawable.TransitionDrawable;
@@ -48,40 +48,29 @@ public class LoginFragment extends Fragment {
     private View.OnClickListener OnFbClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            makeMeRequest();
             showProgress(true);
+            makeMeRequest();
         }
     };
 
-    private void makeMeRequest() {
-        List<String> permissions = Arrays.asList("public_profile", "user_friends", "user_about_me",
-                "user_relationships", "user_birthday", "user_location");
-        ParseFacebookUtils.logIn(permissions, getActivity(), new LogInCallback() {
-            @Override
-            public void done(ParseUser user, ParseException err) {
-                showProgress(false);
-                if (user == null) {
-                    Log.d(getClass().getName(),
-                            "Uh oh. The user cancelled the Facebook login.");
-                } else if (user.isNew()) {
-                    Log.d(getClass().getName(),
-                            "User signed up and logged in through Facebook!");
-//                    showUserDetailsActivity();
-                } else {
-                    Log.d(getClass().getName(),
-                            "User logged in through Facebook!");
-//                    showUserDetailsActivity();
-                }
-            }
-        });
-    }
 
     @SuppressWarnings("ConstantConditions")
     private void showProgress(boolean show) {
+        if(!isAdded())
+            return;
+        final View progressContainer = getView().findViewById(R.id.loadingContainer);
+        final View fbButton = getView().findViewById(R.id.fb_login);
+
         TransitionDrawable background = (TransitionDrawable) getActivity().findViewById(R.id.rootLayout).getBackground();
-        ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(getView().findViewById(R.id.loadingContainer), "alpha",
-                show?0:1, show?1:0);
-        objectAnimator.setDuration(getResources().getInteger(R.integer.fade));
+        ValueAnimator valueAnimator = ValueAnimator.ofFloat(show?0:1, show?1:0);
+        valueAnimator.setDuration(getResources().getInteger(R.integer.fade));
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                progressContainer.setAlpha((Float) valueAnimator.getAnimatedValue());
+                fbButton.setAlpha(1-(Float) valueAnimator.getAnimatedValue());
+            }
+        });
 
         if (show) {
             background.startTransition(getResources().getInteger(R.integer.fade));
@@ -89,6 +78,37 @@ public class LoginFragment extends Fragment {
             background.reverseTransition(getResources().getInteger(R.integer.fade));
         }
 
-        objectAnimator.start();
+        valueAnimator.start();
     }
+
+    private void makeMeRequest() {
+        List<String> permissions = Arrays.asList("public_profile", "user_friends", "user_about_me",
+                "user_relationships", "user_birthday", "user_location");
+        ParseFacebookUtils.logIn(permissions, getActivity(), new LogInCallback() {
+            @Override
+            public void done(ParseUser user, ParseException err) {
+//                showProgress(false);
+                Log.d(getClass().getName(), "Done");
+                if (user == null) {
+                    Log.d(getClass().getName(),
+                            "Uh oh. The user cancelled the Facebook login");
+                } else if (user.isNew()) {
+                    Log.d(getClass().getName(),
+                            "User signed up and logged in through Facebook!");
+                    showMainFragment(user);
+                } else {
+                    Log.d(getClass().getName(),
+                            "User logged in through Facebook!");
+                    showMainFragment(user);
+                }
+                showProgress(false);
+            }
+        });
+    }
+
+    private void showMainFragment(ParseUser user){
+        Log.d(getClass().getName(), "UserName: " + user.getUsername() + "\tEmail: " + user.getEmail());
+
+    }
+
 }

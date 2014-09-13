@@ -1,6 +1,7 @@
 package io.perihelion.fitfactor;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -11,7 +12,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Wearable;
-import com.parse.Parse;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
 
@@ -31,10 +31,6 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Parse.initialize(this, "KqI3fIwrmgp1rep6UX31wZipcJACRJwtG66GNYoV", "fwXo7e2YQogv0OQybIhJqYHmsIVmEWZWNI92nbg0");
-        ParseFacebookUtils.initialize("687629864647249");
-        getFragmentManager().beginTransaction().add(R.id.container, new LoginFragment()).commit();
-
         getFragmentManager().beginTransaction().add(R.id.container, new LoginFragment()).commit();
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -43,6 +39,14 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
                 .addOnConnectionFailedListener(this)
                 .build();
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        ParseFacebookUtils.finishAuthentication(requestCode, resultCode, data);
+        Log.d(getClass().getName(), "Got OnActivityResult");
+    }
+
 
     @Override
     protected void onStart() {
