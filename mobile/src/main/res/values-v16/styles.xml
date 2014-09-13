@@ -1,0 +1,17 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="android:Theme.Holo.Light">
+        <item name="android:textViewStyle">@style/TextAppearance.FitFactor</item>
+        <item name="android:buttonStyle">@style/ButtonTextAppearance.FitFactor</item>
+    </style>
+
+    <style name="TextAppearance.FitFactor" parent="android:Widget.TextView">
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
+    <style name="ButtonTextAppearance.FitFactor" parent="android:Widget.Holo.Button">
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
+</resources>

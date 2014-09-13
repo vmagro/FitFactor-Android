@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="FitFactor.Text.Header" parent="android:TextAppearance">
+        <item name="android:color">@android:color/black</item>
+        <item name="android:textSize">35sp</item>
+    </style>
+</resources>
