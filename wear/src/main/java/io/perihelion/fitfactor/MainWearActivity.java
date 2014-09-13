@@ -5,6 +5,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.wearable.view.CircledImageView;
 import android.util.Log;
@@ -13,6 +14,9 @@ import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
@@ -22,7 +26,7 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 
-public class MainWearActivity extends Activity implements SensorEventListener {
+public class MainWearActivity extends Activity implements SensorEventListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private final String TAG = this.getClass().getName();
 
@@ -57,29 +61,18 @@ public class MainWearActivity extends Activity implements SensorEventListener {
         mSensorManager.registerListener(this, mStepCountSensor, SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this, mStepDetectSensor, SensorManager.SENSOR_DELAY_NORMAL);
 
-        GoogleApiClient mGoogleAppiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
-                    @Override
-                    public void onConnected(Bundle connectionHint) {
-                        Log.d(TAG, "onConnected: " + connectionHint);
-                        // Now you can use the data layer API
-                    }
-
-                    @Override
-                    public void onConnectionSuspended(int cause) {
-                        Log.d(TAG, "onConnectionSuspended: " + cause);
-                    }
-                })
-                .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(ConnectionResult result) {
-                        Log.d(TAG, "onConnectionFailed: " + result);
-                    }
-                })
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
                 .build();
-        mGoogleAppiClient.connect();
+    }
 
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
     }
 
     @Override
@@ -91,31 +84,69 @@ public class MainWearActivity extends Activity implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        Log.d(TAG, "sensor event: " + sensorEvent.sensor.getName() + " " + sensorEvent.accuracy + " = " + sensorEvent.values[0]);
+//        Log.d(TAG, "sensor event: " + sensorEvent.sensor.getName() + " " + sensorEvent.accuracy + " = " + sensorEvent.values[0]);
         if (sensorEvent.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
             mTextView.setText("" + (int) sensorEvent.values[0]);
-            JSONObject json = new JSONObject();
-            try {
-                json.put("sensor", sensorEvent.sensor.getName());
-                json.put("value", sensorEvent.values[0]);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            NodeApi.GetConnectedNodesResult nodes =
-                    Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
-            for (Node node : nodes.getNodes()) {
-                try {
-                    Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(), TAG, json.toString().getBytes("UTF-8")).await();
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-            }
+            new SendMessageTask(sensorEvent.sensor.getName(), sensorEvent.values[0]).execute();
         }
     }
-
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
         Log.d(TAG, "accuracy changed: " + i);
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        Log.d(TAG, "Connected to Google Api Service");
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Log.d(TAG, "connection failed");
+    }
+
+    private class SendMessageTask extends AsyncTask<Void, Void, Void> {
+
+        String sensorName;
+        float value;
+
+        public SendMessageTask(String name, float value) {
+            this.sensorName = name;
+            this.value = value;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            JSONObject json = new JSONObject();
+            try {
+                json.put("sensor", sensorName);
+                json.put("value", value);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            NodeApi.GetConnectedNodesResult nodes =
+                    Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
+            for (Node node : nodes.getNodes()) {
+                try {
+                    PendingResult<MessageApi.SendMessageResult> result = Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(), TAG, json.toString().getBytes("UTF-8"));
+                    result.setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
+                        @Override
+                        public void onResult(MessageApi.SendMessageResult sendMessageResult) {
+                            Log.d(TAG, "status: " + sendMessageResult.getStatus().getStatusMessage() + " " + sendMessageResult.getStatus().toString());
+                        }
+                    });
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
     }
 }
