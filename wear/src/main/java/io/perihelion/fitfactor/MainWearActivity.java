@@ -11,6 +11,10 @@ import android.util.Log;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.Wearable;
+
 public class MainWearActivity extends Activity implements SensorEventListener {
 
     private final String TAG = this.getClass().getName();
@@ -24,6 +28,7 @@ public class MainWearActivity extends Activity implements SensorEventListener {
     Sensor mStepCountSensor;
     Sensor mStepDetectSensor;
     SensorManager mSensorManager;
+    GoogleApiClient mGoogleAppiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +49,28 @@ public class MainWearActivity extends Activity implements SensorEventListener {
         mSensorManager.registerListener(this, mHeartRateSensor, SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this, mStepCountSensor, SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this, mStepDetectSensor, SensorManager.SENSOR_DELAY_NORMAL);
+
+        GoogleApiClient mGoogleAppiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                    @Override
+                    public void onConnected(Bundle connectionHint) {
+                        Log.d(TAG, "onConnected: " + connectionHint);
+                        // Now you can use the data layer API
+                    }
+                    @Override
+                    public void onConnectionSuspended(int cause) {
+                        Log.d(TAG, "onConnectionSuspended: " + cause);
+                    }
+                })
+                .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(ConnectionResult result) {
+                        Log.d(TAG, "onConnectionFailed: " + result);
+                    }
+                })
+                .addApi(Wearable.API)
+                .build();
+        mGoogleAppiClient.connect();
 
     }
 
