@@ -13,7 +13,14 @@ import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
 
 public class MainWearActivity extends Activity implements SensorEventListener {
 
@@ -28,7 +35,7 @@ public class MainWearActivity extends Activity implements SensorEventListener {
     Sensor mStepCountSensor;
     Sensor mStepDetectSensor;
     SensorManager mSensorManager;
-    GoogleApiClient mGoogleAppiClient;
+    GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +44,7 @@ public class MainWearActivity extends Activity implements SensorEventListener {
         mCircledImageView = (CircledImageView) findViewById(R.id.circle);
         mTextView = (TextView) findViewById(R.id.sensorCount);
 
-        mSensorManager = ((SensorManager)getSystemService(SENSOR_SERVICE));
+        mSensorManager = ((SensorManager) getSystemService(SENSOR_SERVICE));
         mHeartRateSensor = mSensorManager.getDefaultSensor(MOTO_360_HEART_RATE);
         mHeartRateSensorDeafult = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
         mStepCountSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
@@ -57,6 +64,7 @@ public class MainWearActivity extends Activity implements SensorEventListener {
                         Log.d(TAG, "onConnected: " + connectionHint);
                         // Now you can use the data layer API
                     }
+
                     @Override
                     public void onConnectionSuspended(int cause) {
                         Log.d(TAG, "onConnectionSuspended: " + cause);
@@ -77,7 +85,7 @@ public class MainWearActivity extends Activity implements SensorEventListener {
     @Override
     protected void onPause() {
         super.onPause();
-        if (mSensorManager!=null)
+        if (mSensorManager != null)
             mSensorManager.unregisterListener(this);
     }
 
@@ -85,12 +93,26 @@ public class MainWearActivity extends Activity implements SensorEventListener {
     public void onSensorChanged(SensorEvent sensorEvent) {
         Log.d(TAG, "sensor event: " + sensorEvent.sensor.getName() + " " + sensorEvent.accuracy + " = " + sensorEvent.values[0]);
         if (sensorEvent.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
-            if (mTextView == null) {
-                Log.d(TAG, "textView null");
-            }
             mTextView.setText("" + (int) sensorEvent.values[0]);
+            JSONObject json = new JSONObject();
+            try {
+                json.put("sensor", sensorEvent.sensor.getName());
+                json.put("value", sensorEvent.values[0]);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            NodeApi.GetConnectedNodesResult nodes =
+                    Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
+            for (Node node : nodes.getNodes()) {
+                try {
+                    Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(), TAG, json.toString().getBytes("UTF-8")).await();
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
+
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {

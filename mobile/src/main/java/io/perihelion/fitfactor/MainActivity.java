@@ -8,43 +8,46 @@ import android.view.MenuItem;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Wearable;
 import com.parse.Parse;
+import com.parse.ParseFacebookUtils;
 
-public class MainActivity extends Activity {
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
+
+import io.perihelion.fitfactor.Fragments.LoginFragment;
+
+public class MainActivity extends Activity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, MessageApi.MessageListener {
 
     private final String TAG = this.getClass().getName();
-    GoogleApiClient mGoogleAppiClient;
+    private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Parse.initialize(this, "KqI3fIwrmgp1rep6UX31wZipcJACRJwtG66GNYoV", "fwXo7e2YQogv0OQybIhJqYHmsIVmEWZWNI92nbg0");
+        ParseFacebookUtils.initialize("687629864647249");
+        getFragmentManager().beginTransaction().add(R.id.container, new LoginFragment()).commit();
 
-        GoogleApiClient mGoogleAppiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
-                    @Override
-                    public void onConnected(Bundle connectionHint) {
-                        Log.d(TAG, "onConnected: " + connectionHint);
-                        // Now you can use the data layer API
-                    }
-                    @Override
-                    public void onConnectionSuspended(int cause) {
-                        Log.d(TAG, "onConnectionSuspended: " + cause);
-                    }
-                })
-                .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(ConnectionResult result) {
-                        Log.d(TAG, "onConnectionFailed: " + result);
-                    }
-                })
+        getFragmentManager().beginTransaction().add(R.id.container, new LoginFragment()).commit();
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
                 .build();
-        mGoogleAppiClient.connect();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -66,5 +69,44 @@ public class MainActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        Log.d(TAG, "Connected to Google Api Service");
+        Wearable.MessageApi.addListener(mGoogleApiClient, this);
+    }
+
+    @Override
+    protected void onStop() {
+        if (null != mGoogleApiClient && mGoogleApiClient.isConnected()) {
+            Wearable.MessageApi.removeListener(mGoogleApiClient, this);
+            mGoogleApiClient.disconnect();
+        }
+        super.onStop();
+    }
+
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onMessageReceived(MessageEvent messageEvent) {
+        try {
+            String message = new String(messageEvent.getData(), "UTF-8");
+            JSONObject jsonObject = new JSONObject(message);
+            Log.d(TAG, jsonObject.toString());
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }
