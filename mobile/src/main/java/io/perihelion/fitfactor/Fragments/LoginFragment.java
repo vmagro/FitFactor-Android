@@ -3,7 +3,6 @@ package io.perihelion.fitfactor.Fragments;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.Fragment;
-import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +13,7 @@ import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.Arrays;
 import java.util.List;
@@ -61,7 +61,6 @@ public class LoginFragment extends Fragment {
         final View progressContainer = getView().findViewById(R.id.loadingContainer);
         final View fbButton = getView().findViewById(R.id.fb_login);
 
-        TransitionDrawable background = (TransitionDrawable) getActivity().findViewById(R.id.rootLayout).getBackground();
         ValueAnimator valueAnimator = ValueAnimator.ofFloat(show?0:1, show?1:0);
         valueAnimator.setDuration(getResources().getInteger(R.integer.fade));
         valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -72,12 +71,6 @@ public class LoginFragment extends Fragment {
             }
         });
 
-        if (show) {
-            background.startTransition(getResources().getInteger(R.integer.fade));
-        } else {
-            background.reverseTransition(getResources().getInteger(R.integer.fade));
-        }
-
         valueAnimator.start();
     }
 
@@ -87,7 +80,6 @@ public class LoginFragment extends Fragment {
         ParseFacebookUtils.logIn(permissions, getActivity(), new LogInCallback() {
             @Override
             public void done(ParseUser user, ParseException err) {
-//                showProgress(false);
                 Log.d(getClass().getName(), "Done");
                 if (user == null) {
                     Log.d(getClass().getName(),
@@ -95,20 +87,39 @@ public class LoginFragment extends Fragment {
                 } else if (user.isNew()) {
                     Log.d(getClass().getName(),
                             "User signed up and logged in through Facebook!");
-                    showMainFragment(user);
+//                    showMainFragment(user);
+                    linkUser(user);
                 } else {
                     Log.d(getClass().getName(),
                             "User logged in through Facebook!");
-                    showMainFragment(user);
+//                    showMainFragment(user);
+                    linkUser(user);
                 }
-                showProgress(false);
             }
         });
+    }
+
+    private void linkUser(final ParseUser user){
+        if (!ParseFacebookUtils.isLinked(user)) {
+            ParseFacebookUtils.link(user, getActivity(), new SaveCallback() {
+                @Override
+                public void done(ParseException ex) {
+                    if (ParseFacebookUtils.isLinked(user)) {
+                        Log.d(getClass().getName(), "Woohoo, user logged in with Facebook!");
+                        showMainFragment(user);
+                    }
+                }
+            });
+        }
+        else {
+            Log.d(getClass().getName(), "User is already Linked!");
+            showMainFragment(user);
+        }
     }
 
     private void showMainFragment(ParseUser user){
         Log.d(getClass().getName(), "UserName: " + user.getUsername() + "\tEmail: " + user.getEmail());
 
-    }
 
+    }
 }
