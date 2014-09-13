@@ -22,4 +22,5 @@
     <color name="color_asbestos">#7f8c8d</color>
     <color name="white">#FFFFFF</color>
     <color name="color_facebook">#2D4586</color>
+    <color name="color_white_transparent">#CCFFFFFF</color>
 </resources>

@@ -9,6 +9,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -50,9 +52,10 @@ public class MainFragment extends Fragment implements MainActivity.OnBackPressed
         View view = inflater.inflate(R.layout.fragment_main, null);
         loadFriendImage(view);
         loadFriendList(view);
+        loadStats(view);
 
         view.findViewById(R.id.accountable_container).setOnClickListener(accountableClickListener);
-
+        ((ListView) view.findViewById(R.id.friendChooser)).setOnItemClickListener(friendsListItemClickListener);
         return view;
     }
 
@@ -76,12 +79,12 @@ public class MainFragment extends Fragment implements MainActivity.OnBackPressed
                     public void onCompleted(Response response) {
                         Log.d(getClass().getName(), response.getGraphObject().getInnerJSONObject().toString());
                         Log.d(getClass().getName(), "Is GraphUser: " + String.valueOf(response.getGraphObject() instanceof GraphUser));
+
                     }
                 }
         );
         request.executeAsync();
     }
-
     private void loadFriendList(final View view){
         Request.newMyFriendsRequest(ParseFacebookUtils.getSession(), new Request.GraphUserListCallback() {
             @Override
@@ -97,14 +100,22 @@ public class MainFragment extends Fragment implements MainActivity.OnBackPressed
             }
         }).executeAsync();
     }
+    private void loadStats(final View view){
+        //TODO: Get Stats from Parse
+        int percentCompleted = 25;
+        String lockedString = "Locked";
 
-    private View.OnClickListener accountableClickListener = new View.OnClickListener(){
-        @Override
-        public void onClick(View view) {
-            showList();
-        }
-    };
+        /*((TextView) view.findViewById(R.id.main_final_goal)).setText(
+                String.format(getString(R.string.))
+        );*/
+        ((TextView) view.findViewById(R.id.main_current_completed)).setText(
+                String.format(getString(R.string.format_goal_completed), percentCompleted)
+        );
 
+        ((TextView) view.findViewById(R.id.status)).setText(
+                String.format(getString(R.string.format_currently), lockedString)
+        );
+    }
     private void showList(){
         final View list = getView().findViewById(R.id.friendChooser);
         final int finalHeight = list.getMeasuredHeight();
@@ -162,6 +173,33 @@ public class MainFragment extends Fragment implements MainActivity.OnBackPressed
         animator.start();
     }
 
+    private View.OnClickListener accountableClickListener = new View.OnClickListener(){
+        @Override
+        public void onClick(View view) {
+            showList();
+        }
+    };
+    private AbsListView.OnItemClickListener friendsListItemClickListener = new AbsListView.OnItemClickListener(){
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            //Get the User
+            GraphUser user = ((FriendListAdapter) adapterView.getAdapter()).getItem(i);
+
+            //Save the Facebook Id in the Database
+            ParseUser.getCurrentUser().put(Constants.FACEBOOK_ID_FRIEND, user.getId());
+            ParseUser.getCurrentUser().saveInBackground();
+
+            //Load it into the Current View
+            ((ProfilePictureView) getView().findViewById(R.id.main_prof)).setProfileId(user.getId());
+            ((TextView) getView().findViewById(R.id.accountable)).setText(String.format(
+                            getResources().getString(R.string.format_accountable,
+                                    user.getName()))
+            );
+
+            hideList();
+        }
+    };
+
     @Override
     public boolean onBackPressed() {
         if(listShowing){
@@ -171,27 +209,6 @@ public class MainFragment extends Fragment implements MainActivity.OnBackPressed
         else
             return false;
     }
-
-    private class ListHeightUpdateListener implements ValueAnimator.AnimatorUpdateListener {
-
-        View list;
-        int delta;
-        int currentHeight;
-
-        public ListHeightUpdateListener(View list, int currentHeight, int delta) {
-            this.list = list;
-            this.delta = delta;
-            this.currentHeight = currentHeight;
-        }
-
-        @Override
-        public void onAnimationUpdate(ValueAnimator valueAnimator) {
-            float value = (Float) valueAnimator.getAnimatedValue();
-            //Update List Height
-            list.getLayoutParams().height = currentHeight + Math.round(delta * value);
-            list.requestLayout();
-        }
-    };
     private class FadeInverseUpdateListener implements ValueAnimator.AnimatorUpdateListener{
         List<View> views;
 
@@ -207,7 +224,6 @@ public class MainFragment extends Fragment implements MainActivity.OnBackPressed
             }
         }
     }
-
     private class FadeUpdateListener implements ValueAnimator.AnimatorUpdateListener{
         List<View> views;
         public FadeUpdateListener(View... views){
