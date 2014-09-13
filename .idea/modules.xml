@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/FitFactor.iml" filepath="$PROJECT_DIR$/FitFactor.iml" />
       <module fileurl="file://$PROJECT_DIR$/FitFactor-Android.iml" filepath="$PROJECT_DIR$/FitFactor-Android.iml" />
       <module fileurl="file://$PROJECT_DIR$/FitFactor-Android.iml" filepath="$PROJECT_DIR$/FitFactor-Android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/facebook/facebook.iml" filepath="$PROJECT_DIR$/facebook/facebook.iml" />
       <module fileurl="file://$PROJECT_DIR$/mobile/mobile.iml" filepath="$PROJECT_DIR$/mobile/mobile.iml" />
       <module fileurl="file://$PROJECT_DIR$/wear/wear.iml" filepath="$PROJECT_DIR$/wear/wear.iml" />
     </modules>
