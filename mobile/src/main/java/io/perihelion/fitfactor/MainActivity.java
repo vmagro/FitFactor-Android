@@ -13,6 +13,7 @@ import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Wearable;
 import com.parse.Parse;
 import com.parse.ParseFacebookUtils;
+import com.parse.ParseObject;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -102,6 +103,12 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
         try {
             String message = new String(messageEvent.getData(), "UTF-8");
             JSONObject jsonObject = new JSONObject(message);
+
+            ParseObject stepCountUpdate = new ParseObject("StepCountUpdate");
+            stepCountUpdate.put("value", jsonObject.getString("value"));
+            stepCountUpdate.put("sensor", jsonObject.getString("sensor"));
+            stepCountUpdate.saveInBackground();
+
             Log.d(TAG, jsonObject.toString());
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();

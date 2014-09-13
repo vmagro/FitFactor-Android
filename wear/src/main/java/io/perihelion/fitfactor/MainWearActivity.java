@@ -41,6 +41,8 @@ public class MainWearActivity extends Activity implements SensorEventListener, G
     SensorManager mSensorManager;
     GoogleApiClient mGoogleApiClient;
 
+    private float currentStepCount = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,7 +89,9 @@ public class MainWearActivity extends Activity implements SensorEventListener, G
 //        Log.d(TAG, "sensor event: " + sensorEvent.sensor.getName() + " " + sensorEvent.accuracy + " = " + sensorEvent.values[0]);
         if (sensorEvent.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
             mTextView.setText("" + (int) sensorEvent.values[0]);
-            new SendMessageTask(sensorEvent.sensor.getName(), sensorEvent.values[0]).execute();
+            float delta = sensorEvent.values[0] - currentStepCount;
+            currentStepCount = sensorEvent.values[0];
+            new SendMessageTask(sensorEvent.sensor.getName(), delta).execute();
         }
     }
 
@@ -126,7 +130,7 @@ public class MainWearActivity extends Activity implements SensorEventListener, G
             JSONObject json = new JSONObject();
             try {
                 json.put("sensor", sensorName);
-                json.put("value", value);
+                json.put("value", String.valueOf(value));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
