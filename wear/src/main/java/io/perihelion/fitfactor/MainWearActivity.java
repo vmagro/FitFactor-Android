@@ -7,7 +7,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.wearable.view.CircledImageView;
-import android.support.wearable.view.WatchViewStub;
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.TextView;
@@ -27,15 +26,11 @@ public class MainWearActivity extends Activity implements SensorEventListener {
     SensorManager mSensorManager;
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        mSensorManager.unregisterListener(this);
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_wear);
+        setContentView(R.layout.activity_main_standalone);
+        mCircledImageView = (CircledImageView) findViewById(R.id.circle);
+        mTextView = (TextView) findViewById(R.id.sensorCount);
 
         mSensorManager = ((SensorManager)getSystemService(SENSOR_SERVICE));
         mHeartRateSensor = mSensorManager.getDefaultSensor(MOTO_360_HEART_RATE);
@@ -43,37 +38,13 @@ public class MainWearActivity extends Activity implements SensorEventListener {
         mStepCountSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
         mStepDetectSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
 
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
         mSensorManager.registerListener(this, mHeartRateSensorDeafult, SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this, mHeartRateSensor, SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this, mStepCountSensor, SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this, mStepDetectSensor, SensorManager.SENSOR_DELAY_NORMAL);
 
-//        List<Sensor> sensors = mSensorManager.getSensorList(Sensor.TYPE_ALL);
-//        for (Sensor sensor : sensors) {
-//            Log.d("Sensors", "" + sensor.getStringType() + " " + sensor.getType() + " " + sensor.getName());
-//        }
-
-        //View
-        final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
-        stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
-            @Override
-            public void onLayoutInflated(WatchViewStub stub) {
-                mCircledImageView = (CircledImageView) stub.findViewById(R.id.circle);
-                mTextView = (TextView) stub.findViewById(R.id.value);
-            }
-        });
-
-        Log.d(TAG, "Done setting up");
-
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (mSensorManager != null){
-            mSensorManager.registerListener(this, mHeartRateSensor, SensorManager.SENSOR_DELAY_NORMAL);
-        }
     }
 
     @Override
@@ -87,9 +58,11 @@ public class MainWearActivity extends Activity implements SensorEventListener {
     public void onSensorChanged(SensorEvent sensorEvent) {
         Log.d(TAG, "sensor event: " + sensorEvent.sensor.getName() + " " + sensorEvent.accuracy + " = " + sensorEvent.values[0]);
         if (sensorEvent.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
+            if (mTextView == null) {
+                Log.d(TAG, "textView null");
+            }
             mTextView.setText("" + (int) sensorEvent.values[0]);
         }
-//        mTextView.setText(sensorEvent.values[0] + " bpm");
     }
 
     @Override
