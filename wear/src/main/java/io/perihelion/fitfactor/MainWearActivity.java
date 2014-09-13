@@ -30,6 +30,7 @@ import java.util.List;
 public class MainWearActivity extends Activity implements SensorEventListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private final String TAG = this.getClass().getName();
+    private int lastHeartRate;
 
     private static final int MOTO_360_HEART_RATE = 21;
     private CircledImageView mCircledImageView;
@@ -59,7 +60,7 @@ public class MainWearActivity extends Activity implements SensorEventListener, G
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        mSensorManager.registerListener(this, mHeartRateSensor, SensorManager.SENSOR_DELAY_UI);
+//        mSensorManager.registerListener(this, mHeartRateSensor, SensorManager.SENSOR_DELAY_UI);
         mSensorManager.registerListener(this, mStepCountSensor, SensorManager.SENSOR_DELAY_NORMAL);
 //        mSensorManager.registerListener(this, mStepDetectSensor, SensorManager.SENSOR_DELAY_NORMAL);
 
@@ -83,6 +84,7 @@ public class MainWearActivity extends Activity implements SensorEventListener, G
 
         SensorManager localSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         boolean bool = localSensorManager.registerListener(this, localSensorManager.getDefaultSensor(21), 2);
+        Log.d(TAG, "Heart rate started, registering heart rate listener, status: " + bool);
     }
 
     @Override
@@ -104,6 +106,18 @@ public class MainWearActivity extends Activity implements SensorEventListener, G
             }
         }
     }
+
+//    public void onSensorChanged(SensorEvent paramSensorEvent)
+//    {
+//        int i = (int)paramSensorEvent.values[0];
+//        if ((i != 0) && (lastHeartRate != i))
+//        {
+//            String str = String.valueOf(i);
+//            mTextView.setText(str);
+//        }
+//        lastHeartRate = i;
+//        Log.d(TAG, "heart rate = " + i);
+//    }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {

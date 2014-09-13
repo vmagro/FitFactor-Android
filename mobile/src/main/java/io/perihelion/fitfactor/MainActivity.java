@@ -41,7 +41,7 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
         super.onCreate(savedInstanceState);
 
         Bundle extras = getIntent().getExtras();
-        if (null != extras) {
+        if (null != extras && null != extras.getString("com.parse.Data")) {
             String parseData = extras.getString("com.parse.Data");
             Log.d(TAG, parseData);
             try {
@@ -108,9 +108,7 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
+
 
         return super.onOptionsItemSelected(item);
     }
