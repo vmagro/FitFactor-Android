@@ -3,12 +3,16 @@ package io.perihelion.fitfactor.Fragments;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.facebook.Request;
+import com.facebook.Response;
+import com.facebook.model.GraphUser;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
@@ -19,6 +23,7 @@ import com.parse.SaveCallback;
 import java.util.Arrays;
 import java.util.List;
 
+import io.perihelion.fitfactor.Constants;
 import io.perihelion.fitfactor.R;
 
 /**
@@ -85,12 +90,10 @@ public class LoginFragment extends Fragment {
                 } else if (user.isNew()) {
                     Log.d(getClass().getName(),
                             "User signed up and logged in through Facebook!");
-//                    showMainFragment(user);
                     linkUser(user);
                 } else {
                     Log.d(getClass().getName(),
                             "User logged in through Facebook!");
-//                    showMainFragment(user);
                     linkUser(user);
                 }
             }
@@ -107,20 +110,33 @@ public class LoginFragment extends Fragment {
                 public void done(ParseException ex) {
                     if (ParseFacebookUtils.isLinked(user)) {
                         Log.d(getClass().getName(), "Woohoo, user logged in with Facebook!");
-                        showMainFragment(user);
                     }
                 }
             });
         }
         else {
             Log.d(getClass().getName(), "User is already Linked!");
-            showMainFragment(user);
         }
+        getFacebookIdInBackground();
     }
 
-    private void showMainFragment(ParseUser user){
-        Log.d(getClass().getName(), "UserName: " + user.getUsername() + "\tEmail: " + user.getEmail());
+    private void getFacebookIdInBackground() {
+        Request.executeMeRequestAsync(ParseFacebookUtils.getSession(), new Request.GraphUserCallback() {
+            @Override
+            public void onCompleted(GraphUser user, Response response) {
+                if (user != null) {
+                    ParseUser.getCurrentUser().put(Constants.FACEBOOK_ID,user.getId());
+                    ParseUser.getCurrentUser().saveInBackground();
+                    showMainFragment();
+                }
+            }
+        });
+    }
 
-        getFragmentManager().beginTransaction().replace(R.id.container, new MainFragment()).addToBackStack(null).commit();
+    private void showMainFragment(){
+        getFragmentManager().beginTransaction().replace(R.id.container, new MainFragment())
+                .setCustomAnimations(R.animator.fade_in, R.animator.fade_out)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .commit();
     }
 }

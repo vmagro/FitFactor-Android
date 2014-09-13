@@ -4,5 +4,7 @@
     <string name="app_name">FitFactor</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-
+    <string name="format_accountable">%s is Holding You Accountable</string>
+    <string name="format_goal_completed">%d %%of Goal Completed</string>
+    <string name="accountable_null">Make someone accountable for you</string>
 </resources>

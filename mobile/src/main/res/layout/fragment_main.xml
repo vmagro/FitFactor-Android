@@ -5,13 +5,14 @@
     android:layout_height="match_parent">
 
     <TextView
+        android:id="@+id/status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Currently: Locked"
         android:textSize="25dp"
         android:layout_centerVertical="true"
-        android:layout_alignRight="@+id/linearLayout"
-        android:layout_alignEnd="@+id/linearLayout"
+        android:layout_alignRight="@+id/stats"
+        android:layout_alignEnd="@+id/stats"
         android:textStyle="italic"/>
 
     <LinearLayout
@@ -23,11 +24,11 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:gravity="right"
-        android:id="@+id/linearLayout">
+        android:id="@+id/stats">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="25% of Goal Completed"
+            android:text="@string/format_goal_completed"
             android:textStyle="bold"
             android:textSize="20sp"
             android:layout_marginBottom="10dp"
@@ -36,7 +37,7 @@
         <ProgressBar
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="250dp"
+            android:layout_width="225dp"
             android:layout_height="wrap_content"
             android:progress="25"
             />
@@ -45,30 +46,49 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Total Goal is 5 episodes a day"
-            android:textSize="20sp"/>
+            android:textSize="18sp"/>
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/accountable_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp">
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+        android:layout_marginStart="10dp"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
+        android:clickable="true"
+        >
+        <com.facebook.widget.ProfilePictureView
+            android:id="@+id/main_prof"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:src="@drawable/ic_launcher"
+            android:scaleType="centerCrop"
             />
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:gravity="center">
+            android:gravity="center_vertical"
+            android:layout_marginLeft="10dp"
+            >
             <TextView
+                android:id="@+id/accountable"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="20dp"
-                android:text="John is Holding You Accountable"/>
-            </LinearLayout>
+                android:textSize="18dp"
+                android:text="@string/format_accountable"/>
         </LinearLayout>
+    </LinearLayout>
+    <ListView
+        android:id="@+id/friendChooser"
+        android:layout_width="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_height="match_parent"
+        android:layout_marginTop="100dp"
+        android:alpha="0"
+        android:visibility="gone"
+        />
 </RelativeLayout>

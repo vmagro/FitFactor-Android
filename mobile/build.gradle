@@ -25,4 +25,5 @@ dependencies {
     compile 'com.google.android.gms:play-services-wearable:+'
     compile files('libs/Parse-1.6.0.jar')
     compile project(':facebook')
+    compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.3'
 }

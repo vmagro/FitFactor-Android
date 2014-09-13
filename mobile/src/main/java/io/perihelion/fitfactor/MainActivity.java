@@ -25,6 +25,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
 import io.perihelion.fitfactor.Fragments.LoginFragment;
 
@@ -32,6 +34,7 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
 
     private final String TAG = this.getClass().getName();
     private GoogleApiClient mGoogleApiClient;
+    private List<OnBackPressedListener> onBackPressedListenerList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,8 +70,8 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
         }
 
         setContentView(R.layout.activity_main);
+        onBackPressedListenerList = new ArrayList<OnBackPressedListener>();
         getFragmentManager().beginTransaction().add(R.id.container, new LoginFragment()).commit();
-
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
                 .addConnectionCallbacks(this)
@@ -156,5 +159,25 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        for(OnBackPressedListener onBackPressedListener : onBackPressedListenerList) {
+            if(onBackPressedListener.onBackPressed())
+                return;
+        }
+        super.onBackPressed();
+
+    }
+
+    public void addOnBackPressedListener(OnBackPressedListener onBackPressedListener){
+        onBackPressedListenerList.add(onBackPressedListener);
+    }
+    public void removeOnBackPressedListener(OnBackPressedListener onBackPressedListener){
+        onBackPressedListenerList.remove(onBackPressedListener);
+    }
+    public interface OnBackPressedListener{
+        public boolean onBackPressed();
     }
 }
