@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import com.parse.Parse;
+import com.parse.ParseFacebookUtils;
 
 import io.perihelion.fitfactor.Fragments.LoginFragment;
 
@@ -15,7 +16,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Parse.initialize(this, "KqI3fIwrmgp1rep6UX31wZipcJACRJwtG66GNYoV", "fwXo7e2YQogv0OQybIhJqYHmsIVmEWZWNI92nbg0");
-
+        ParseFacebookUtils.initialize("687629864647249");
         getFragmentManager().beginTransaction().add(R.id.container, new LoginFragment()).commit();
     }
 

@@ -56,7 +56,6 @@ public class LoginFragment extends Fragment {
     private void makeMeRequest() {
         List<String> permissions = Arrays.asList("public_profile", "user_friends", "user_about_me",
                 "user_relationships", "user_birthday", "user_location");
-        Log.d(getClass().getName(), "Permissions: " + String.valueOf(permissions==null) + "\tActivity: " + String.valueOf(getActivity()==null));
         ParseFacebookUtils.logIn(permissions, getActivity(), new LogInCallback() {
             @Override
             public void done(ParseUser user, ParseException err) {
