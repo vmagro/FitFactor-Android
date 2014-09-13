@@ -8,12 +8,13 @@
         android:id="@+id/status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Currently: Locked"
-        android:textSize="25dp"
         android:layout_centerVertical="true"
         android:layout_alignRight="@+id/stats"
         android:layout_alignEnd="@+id/stats"
-        android:textStyle="italic"/>
+        android:textStyle="italic"
+        android:textSize="25dp"
+        android:text="@string/format_currently"
+        />
 
     <LinearLayout
         android:orientation="vertical"
@@ -23,9 +24,17 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:gravity="right"
-        android:id="@+id/stats">
+        android:gravity="end"
+        android:id="@+id/stats"
+        android:background="@drawable/bkgrnd_blur_white"
+        android:paddingRight="10dp"
+        android:paddingLeft="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        >
+
         <TextView
+            android:id="@+id/main_current_completed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/format_goal_completed"
@@ -43,10 +52,12 @@
             />
 
         <TextView
+            android:id="@+id/main_final_goal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Total Goal is 5 episodes a day"
             android:textSize="18sp"/>
+
     </LinearLayout>
 
     <LinearLayout
@@ -60,6 +71,7 @@
         android:orientation="horizontal"
         android:gravity="center_horizontal"
         android:clickable="true"
+        android:background="@drawable/bkgrnd_blur_white"
         >
         <com.facebook.widget.ProfilePictureView
             android:id="@+id/main_prof"
@@ -71,7 +83,7 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:gravity="center_vertical"
+            android:gravity="center"
             android:layout_marginLeft="10dp"
             >
             <TextView
@@ -79,6 +91,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="18dp"
+                android:maxLines="2"
                 android:text="@string/format_accountable"/>
         </LinearLayout>
     </LinearLayout>
@@ -87,8 +100,9 @@
         android:layout_width="match_parent"
         android:layout_alignParentTop="true"
         android:layout_height="match_parent"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="60dp"
         android:alpha="0"
         android:visibility="gone"
+        android:background="@drawable/bkgrnd_blur_white"
         />
 </RelativeLayout>

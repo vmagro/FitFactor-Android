@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.facebook.HttpMethod;
@@ -50,7 +51,7 @@ public class MainFragment extends Fragment implements MainActivity.OnBackPressed
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, null);
-        loadFriendImage(view);
+        loadFriendDetails(view);
         loadFriendList(view);
         loadStats(view);
 
@@ -59,7 +60,7 @@ public class MainFragment extends Fragment implements MainActivity.OnBackPressed
         return view;
     }
 
-    private void loadFriendImage(View view){
+    private void loadFriendDetails(final View view){
         ParseUser currentUser = ParseUser.getCurrentUser();
         if(currentUser.get(Constants.FACEBOOK_ID_FRIEND)== null) {
             ((TextView) view.findViewById(R.id.accountable)).setText(getString(R.string.accountable_null));
@@ -78,8 +79,9 @@ public class MainFragment extends Fragment implements MainActivity.OnBackPressed
                 new Request.Callback() {
                     public void onCompleted(Response response) {
                         Log.d(getClass().getName(), response.getGraphObject().getInnerJSONObject().toString());
-                        Log.d(getClass().getName(), "Is GraphUser: " + String.valueOf(response.getGraphObject() instanceof GraphUser));
-
+                        ((TextView) view.findViewById(R.id.accountable)).setText(
+                                String.format(getString(R.string.format_accountable), response.getGraphObject().getProperty("first_name"))
+                        );
                     }
                 }
         );
@@ -115,10 +117,11 @@ public class MainFragment extends Fragment implements MainActivity.OnBackPressed
         ((TextView) view.findViewById(R.id.status)).setText(
                 String.format(getString(R.string.format_currently), lockedString)
         );
+
+        ((ProgressBar) view.findViewById(R.id.progressBar)).setProgress(percentCompleted);
     }
     private void showList(){
         final View list = getView().findViewById(R.id.friendChooser);
-        final int finalHeight = list.getMeasuredHeight();
         ValueAnimator animator = ValueAnimator.ofFloat(0, 1);
         animator.addUpdateListener(new FadeUpdateListener(list));
         animator.addUpdateListener(new FadeInverseUpdateListener(
