@@ -33,15 +33,12 @@ public class LoginFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        if(activity.getActionBar() != null)
-            activity.getActionBar().hide();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_login, null);
         view.findViewById(R.id.fb_login).setOnClickListener(OnFbClickListener);
-
         return view;
     }
 
@@ -120,6 +117,6 @@ public class LoginFragment extends Fragment {
     private void showMainFragment(ParseUser user){
         Log.d(getClass().getName(), "UserName: " + user.getUsername() + "\tEmail: " + user.getEmail());
 
-
+        getFragmentManager().beginTransaction().replace(R.id.container, new MainFragment()).addToBackStack(null).commit();
     }
 }
