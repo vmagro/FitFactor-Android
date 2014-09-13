@@ -31,12 +31,11 @@ public class MainWearActivity extends Activity implements SensorEventListener, G
 
     private final String TAG = this.getClass().getName();
 
-    private static final int MOTO_360_HEART_RATE = 65538;
+    private static final int MOTO_360_HEART_RATE = 21;
     private CircledImageView mCircledImageView;
     private TextView mTextView;
 
     Sensor mHeartRateSensor;
-    Sensor mHeartRateSensorDeafult;
     Sensor mStepCountSensor;
     Sensor mStepDetectSensor;
     SensorManager mSensorManager;
@@ -52,17 +51,17 @@ public class MainWearActivity extends Activity implements SensorEventListener, G
         mTextView = (TextView) findViewById(R.id.sensorCount);
 
         mSensorManager = ((SensorManager) getSystemService(SENSOR_SERVICE));
-        mHeartRateSensor = mSensorManager.getDefaultSensor(MOTO_360_HEART_RATE);
-        mHeartRateSensorDeafult = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
+
+        mHeartRateSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
+
         mStepCountSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
         mStepDetectSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        mSensorManager.registerListener(this, mHeartRateSensorDeafult, SensorManager.SENSOR_DELAY_NORMAL);
-        mSensorManager.registerListener(this, mHeartRateSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(this, mHeartRateSensor, SensorManager.SENSOR_DELAY_UI);
         mSensorManager.registerListener(this, mStepCountSensor, SensorManager.SENSOR_DELAY_NORMAL);
-        mSensorManager.registerListener(this, mStepDetectSensor, SensorManager.SENSOR_DELAY_NORMAL);
+//        mSensorManager.registerListener(this, mStepDetectSensor, SensorManager.SENSOR_DELAY_NORMAL);
 
         List<Sensor> sensors = mSensorManager.getSensorList(Sensor.TYPE_ALL);
         for(Sensor s: sensors) {
@@ -81,6 +80,9 @@ public class MainWearActivity extends Activity implements SensorEventListener, G
     protected void onStart() {
         super.onStart();
         mGoogleApiClient.connect();
+
+        SensorManager localSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        boolean bool = localSensorManager.registerListener(this, localSensorManager.getDefaultSensor(21), 2);
     }
 
     @Override
@@ -92,12 +94,14 @@ public class MainWearActivity extends Activity implements SensorEventListener, G
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-//        Log.d(TAG, "sensor event: " + sensorEvent.sensor.getName() + " " + sensorEvent.accuracy + " = " + sensorEvent.values[0]);
+        Log.d(TAG, "sensor event: " + sensorEvent.sensor.getName() + " " + sensorEvent.accuracy + " = " + sensorEvent.values[0]);
         if (sensorEvent.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
             mTextView.setText("" + (int) sensorEvent.values[0]);
             float delta = sensorEvent.values[0] - currentStepCount;
             currentStepCount = sensorEvent.values[0];
-            new SendMessageTask(sensorEvent.sensor.getName(), delta).execute();
+            if (delta > 0) {
+                new SendMessageTask(sensorEvent.sensor.getName(), delta).execute();
+            }
         }
     }
 
