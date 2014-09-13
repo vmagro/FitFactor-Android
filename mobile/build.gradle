@@ -23,4 +23,5 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     wearApp project(':wear')
     compile 'com.google.android.gms:play-services-wearable:+'
+    compile files('libs/Parse-1.6.0.jar')
 }
