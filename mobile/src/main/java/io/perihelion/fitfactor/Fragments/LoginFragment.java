@@ -99,7 +99,7 @@ public class LoginFragment extends Fragment {
 
     private void linkUser(final ParseUser user){
         ParseInstallation installation = ParseInstallation.getCurrentInstallation();
-        installation.put("userid", user);
+        installation.put("user", user);
         installation.saveInBackground();
         if (!ParseFacebookUtils.isLinked(user)) {
             ParseFacebookUtils.link(user, getActivity(), new SaveCallback() {

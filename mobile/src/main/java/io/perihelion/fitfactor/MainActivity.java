@@ -12,9 +12,14 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Wearable;
+import com.parse.GetCallback;
+import com.parse.Parse;
+import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.PushService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,6 +36,36 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Bundle extras = getIntent().getExtras();
+        if (null != extras) {
+            String parseData = extras.getString("com.parse.Data");
+            Log.d(TAG, parseData);
+            try {
+                JSONObject parseJSON = new JSONObject(parseData);
+                String unlockUser = parseJSON.getString("forUser");
+
+                ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
+                query.getInBackground(unlockUser, new GetCallback<ParseObject>() {
+                    public void done(ParseObject object, ParseException e) {
+                        if (null != e) {
+                            Log.d(TAG, e.getMessage());
+                        }
+                        if (null != object) {
+                            Log.d(TAG, "found " + object.getClassName() + " " + object.getObjectId());
+                            ParseObject stepCountUpdate = new ParseObject("FriendUnlock");
+                            stepCountUpdate.put("unlockedBy", ParseUser.getCurrentUser());
+                            stepCountUpdate.put("unlockFor", object);
+                            stepCountUpdate.put("user", ParseUser.getCurrentUser());
+                            stepCountUpdate.saveEventually();
+                        }
+                    }
+                });
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
         setContentView(R.layout.activity_main);
         getFragmentManager().beginTransaction().add(R.id.container, new LoginFragment()).commit();
 
