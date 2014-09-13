@@ -169,7 +169,7 @@ public class MainFragment extends Fragment implements MainActivity.OnBackPressed
             return true;
         }
         else
-           return false;
+            return false;
     }
 
     private class ListHeightUpdateListener implements ValueAnimator.AnimatorUpdateListener {
@@ -203,22 +203,11 @@ public class MainFragment extends Fragment implements MainActivity.OnBackPressed
         public void onAnimationUpdate(ValueAnimator valueAnimator) {
             for(View view : views){
                 view.setAlpha(1-(Float) valueAnimator.getAnimatedValue());
-            }
-            if((Float)valueAnimator.getAnimatedValue() == 1){
-                for(View view : views) {
-                    if(view.getAlpha() <= .5)
-                        view.setVisibility(View.GONE);
-                    else
-                        view.setVisibility(View.VISIBLE);
-                }
-            }
-            else if(views.get(0).getAlpha() > 0){
-                for(View view : views){
-                    view.setVisibility(View.VISIBLE);
-                }
+                checkVisibility(view);
             }
         }
     }
+
     private class FadeUpdateListener implements ValueAnimator.AnimatorUpdateListener{
         List<View> views;
         public FadeUpdateListener(View... views){
@@ -227,23 +216,16 @@ public class MainFragment extends Fragment implements MainActivity.OnBackPressed
 
         @Override
         public void onAnimationUpdate(ValueAnimator valueAnimator) {
-            for(View view: views)
+            for(View view: views) {
                 view.setAlpha((Float) valueAnimator.getAnimatedValue());
-
-            if((Float)valueAnimator.getAnimatedValue() == 1){
-                for(View view : views) {
-                    if(view.getAlpha() <= .5)
-                        view.setVisibility(View.GONE);
-                    else
-                        view.setVisibility(View.VISIBLE);
-                }
+                checkVisibility(view);
             }
-            else if(views.get(0).getAlpha() > 0){
-                for(View view : views){
-                    view.setVisibility(View.VISIBLE);
-                }
-            }
-
         }
+    }
+    private static void checkVisibility(View view){
+        if(view.getAlpha() <= 0)
+            view.setVisibility(View.GONE);
+        else
+            view.setVisibility(View.VISIBLE);
     }
 }
