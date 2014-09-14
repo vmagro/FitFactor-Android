@@ -36,6 +36,7 @@ import io.perihelion.fitfactor.R;
  */
 public class MainFragment extends Fragment implements MainActivity.Callbacks{
     private boolean listShowing = false;
+    private int currentCount;
 
     @Override
     public void onAttach(Activity activity) {
@@ -46,6 +47,7 @@ public class MainFragment extends Fragment implements MainActivity.Callbacks{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        currentCount = ParseUser.getCurrentUser().getInt("currentStepCount");
     }
 
     @Override
@@ -103,8 +105,8 @@ public class MainFragment extends Fragment implements MainActivity.Callbacks{
         }).executeAsync();
     }
     private void loadStats(final View view){
-        final int percentage = (int) Math.floor(((double)ParseUser.getCurrentUser().getInt("currentStepCount")/ParseUser.getCurrentUser().getInt("goal"))*100);
-        Log.d(getClass().getName(), "Current completion is " + percentage + "%");
+        final int percentage = (int) Math.floor(
+                ((double)currentCount/ParseUser.getCurrentUser().getInt(Constants.PARSE_GOAL))*100);
 
         String lockedString = (percentage>=100)?"Unlocked":"Locked";
 
@@ -117,7 +119,11 @@ public class MainFragment extends Fragment implements MainActivity.Callbacks{
         );
 
         ((ProgressBar) view.findViewById(R.id.progressBar)).setProgress(percentage);
-        ((TextView) view.findViewById(R.id.main_final_goal)).setText("Your goal is " + ParseUser.getCurrentUser().getInt("goal"));
+        ((TextView) view.findViewById(R.id.main_final_goal)).setText(
+                String.format(getString(R.string.format_goal_current), ParseUser.getCurrentUser().getInt("goal"), "steps")
+        );
+
+        Log.d(getClass().getName(), "Current completion is " + percentage + "%");
     }
     private void showList(){
         final View list = getView().findViewById(R.id.friendChooser);
@@ -215,10 +221,11 @@ public class MainFragment extends Fragment implements MainActivity.Callbacks{
     }
 
     @Override
-    public void onStepCountUpdate(int value) {
+    public void onStepCountUpdate(int delta) {
         if(isAdded()){
-            final int percentage = (int) Math.floor(((double)value/ParseUser.getCurrentUser().getInt("goal"))*100);
-            Log.d(getClass().getName(), "Goal: " + ParseUser.getCurrentUser().getInt("goal") + "\tCurrent: " + value + "\tPercentage: " + percentage);
+            currentCount += delta;
+            final int percentage = (int) Math.floor(((double)currentCount/ParseUser.getCurrentUser().getInt("goal"))*100);
+            Log.d(getClass().getName(), "Goal: " + ParseUser.getCurrentUser().getInt("goal") + "\tCurrent: " + currentCount + "\tPercentage: " + percentage);
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -230,7 +237,6 @@ public class MainFragment extends Fragment implements MainActivity.Callbacks{
             });
         }
     }
-
     private class FadeInverseUpdateListener implements ValueAnimator.AnimatorUpdateListener{
         List<View> views;
 
