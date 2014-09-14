@@ -103,9 +103,11 @@ public class MainFragment extends Fragment implements MainActivity.Callbacks{
         }).executeAsync();
     }
     private void loadStats(final View view){
-        //TODO: Get Stats from Parse
         final int percentage = (int) Math.floor(((double)ParseUser.getCurrentUser().getInt("currentStepCount")/ParseUser.getCurrentUser().getInt("goal"))*100);
-        String lockedString = "Locked";
+        Log.d(getClass().getName(), "Current completion is " + percentage + "%");
+
+        String lockedString = (percentage>=100)?"Unlocked":"Locked";
+
         ((TextView) view.findViewById(R.id.main_current_completed)).setText(
                 String.format(getString(R.string.format_goal_completed), percentage)
         );
@@ -115,7 +117,6 @@ public class MainFragment extends Fragment implements MainActivity.Callbacks{
         );
 
         ((ProgressBar) view.findViewById(R.id.progressBar)).setProgress(percentage);
-
         ((TextView) view.findViewById(R.id.main_final_goal)).setText("Your goal is " + ParseUser.getCurrentUser().getInt("goal"));
     }
     private void showList(){
