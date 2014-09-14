@@ -110,13 +110,27 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
         switch (id) {
             case R.id.action_plus_goal:
                 int goal = ParseUser.getCurrentUser().getInt("goal");
+                int currentValue = ParseUser.getCurrentUser().getInt("currentStepCount");
                 ParseObject stepCountUpdate = new ParseObject("StepCountUpdate");
-                stepCountUpdate.put("value", goal);
+                stepCountUpdate.put("value", goal+currentValue);
                 stepCountUpdate.put("sensor", "Manual Trigger");
                 stepCountUpdate.put("user", ParseUser.getCurrentUser());
                 stepCountUpdate.saveInBackground();
 
+                for (Callbacks callbacks : callbackList)
+                    callbacks.onStepCountUpdate(goal+currentValue);
+
             case R.id.action_reset:
+
+                ParseQuery<ParseObject> query = ParseQuery.getQuery("StepCountUpdate");
+                try {
+                    List<ParseObject> stepCounts = query.find();
+                    for (ParseObject step : stepCounts) {
+                        step.deleteInBackground();
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
 
                 //send force reset
         }
@@ -165,7 +179,7 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
             stepCountUpdate.put("user", ParseUser.getCurrentUser());
             stepCountUpdate.saveInBackground();
 
-            for(Callbacks callbacks : callbackList)
+            for (Callbacks callbacks : callbackList)
                 callbacks.onStepCountUpdate(Float.valueOf(jsonObject.getString("value")).intValue());
 
             Log.d(TAG, jsonObject.toString());
@@ -178,21 +192,25 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
 
     @Override
     public void onBackPressed() {
-        for(Callbacks callbacks : callbackList) {
-            if(callbacks.onBackPressed())
+        for (Callbacks callbacks : callbackList) {
+            if (callbacks.onBackPressed())
                 return;
         }
         super.onBackPressed();
 
     }
-    public void addActivityCallbacks(Callbacks callbacks){
+
+    public void addActivityCallbacks(Callbacks callbacks) {
         callbackList.add(callbacks);
     }
-    public void removeActivityCallbacks(Callbacks callbacks){
+
+    public void removeActivityCallbacks(Callbacks callbacks) {
         callbackList.remove(callbacks);
     }
-    public interface Callbacks{
+
+    public interface Callbacks {
         public boolean onBackPressed();
+
         public void onStepCountUpdate(int value);
     }
 }
