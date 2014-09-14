@@ -8,45 +8,47 @@
         android:id="@+id/status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
         android:layout_alignRight="@+id/stats"
         android:layout_alignEnd="@+id/stats"
-        android:textStyle="italic"
+        android:layout_marginBottom="10dp"
         android:textSize="25dp"
+        android:textStyle="bold|italic"
+        android:textColor="@android:color/white"
         android:text="@string/format_currently"
+        android:layout_above="@+id/stats"
         />
 
     <LinearLayout
+        android:id="@+id/stats"
         android:orientation="vertical"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="150dp"
-        android:layout_alignParentBottom="true"
+        android:layout_above="@+id/accountability"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:gravity="end"
-        android:id="@+id/stats"
-        android:background="@drawable/bkgrnd_blur_white"
+        android:layout_marginBottom="30dp"
         android:paddingRight="10dp"
         android:paddingLeft="10dp"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
+        android:gravity="center"
+        android:background="@drawable/bkgrnd_blur_white"
         >
 
         <TextView
             android:id="@+id/main_current_completed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
             android:text="@string/format_goal_completed"
             android:textStyle="bold"
             android:textSize="20sp"
-            android:layout_marginBottom="10dp"
             />
 
         <ProgressBar
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="225dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:progress="25"
             />
@@ -60,23 +62,39 @@
 
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/accountability"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Accountability"
+        android:textStyle="bold|italic"
+        android:textColor="@android:color/white"
+        android:textSize="25sp"
+        android:layout_marginBottom="10dp"
+        android:layout_above="@+id/accountable_container"
+        android:layout_alignParentRight="true"
+        />
+
     <LinearLayout
         android:id="@+id/accountable_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginLeft="10dp"
-        android:layout_marginStart="10dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="80dp"
         android:orientation="horizontal"
         android:gravity="center_horizontal"
         android:clickable="true"
         android:background="@drawable/bkgrnd_blur_white"
+        android:paddingRight="10dp"
+        android:paddingLeft="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
         >
         <com.facebook.widget.ProfilePictureView
             android:id="@+id/main_prof"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
             android:src="@drawable/ic_launcher"
             android:scaleType="centerCrop"
             />
@@ -85,13 +103,15 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
             >
             <TextView
                 android:id="@+id/accountable"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="18dp"
-                android:maxLines="2"
+                android:maxWidth="250dp"
+                android:maxLines="3"
                 android:text="@string/format_accountable"/>
         </LinearLayout>
     </LinearLayout>

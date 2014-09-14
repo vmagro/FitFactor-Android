@@ -34,13 +34,13 @@ import io.perihelion.fitfactor.R;
 /**
  * Created by vincente on 9/13/14
  */
-public class MainFragment extends Fragment implements MainActivity.OnBackPressedListener{
+public class MainFragment extends Fragment implements MainActivity.Callbacks{
     private boolean listShowing = false;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        ((MainActivity) getActivity()).addOnBackPressedListener(this);
+        ((MainActivity) getActivity()).addActivityCallbacks(this);
     }
 
     @Override
@@ -127,7 +127,8 @@ public class MainFragment extends Fragment implements MainActivity.OnBackPressed
         animator.addUpdateListener(new FadeInverseUpdateListener(
                 getView().findViewById(R.id.accountable_container),
                 getView().findViewById(R.id.stats),
-                getView().findViewById(R.id.status)
+                getView().findViewById(R.id.status),
+                getView().findViewById(R.id.accountability)
         ));
         animator.addListener(new Animator.AnimatorListener() {
             @Override
@@ -155,7 +156,8 @@ public class MainFragment extends Fragment implements MainActivity.OnBackPressed
         animator.addUpdateListener(new FadeInverseUpdateListener(
                 getView().findViewById(R.id.accountable_container),
                 getView().findViewById(R.id.stats),
-                getView().findViewById(R.id.status)
+                getView().findViewById(R.id.status),
+                getView().findViewById(R.id.accountability)
         ));
         animator.addListener(new Animator.AnimatorListener() {
             @Override
@@ -212,6 +214,19 @@ public class MainFragment extends Fragment implements MainActivity.OnBackPressed
         else
             return false;
     }
+
+    @Override
+    public void onStepCountUpdate(int value) {
+        if(isAdded()){
+            int percentage = (int) Math.floor(((double)value/ParseUser.getCurrentUser().getInt("goal"))*100);
+            Log.d(getClass().getName(), "Goal: " + ParseUser.getCurrentUser().getInt("goal") + "\tCurrent: " + value + "\tPercentage: " + percentage);
+            ((ProgressBar)getView().findViewById(R.id.progressBar)).setProgress(percentage);
+            ((TextView) getView().findViewById(R.id.main_current_completed)).setText(
+                    String.format(getString(R.string.format_goal_completed), percentage)
+            );
+        }
+    }
+
     private class FadeInverseUpdateListener implements ValueAnimator.AnimatorUpdateListener{
         List<View> views;
 

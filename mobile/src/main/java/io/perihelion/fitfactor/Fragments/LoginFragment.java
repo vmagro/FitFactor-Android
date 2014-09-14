@@ -56,7 +56,6 @@ public class LoginFragment extends Fragment {
         }
     };
 
-
     @SuppressWarnings("ConstantConditions")
     private void showProgress(boolean show) {
         if(!isAdded())
@@ -76,7 +75,6 @@ public class LoginFragment extends Fragment {
 
         valueAnimator.start();
     }
-
     private void makeMeRequest() {
         List<String> permissions = Arrays.asList("public_profile", "user_friends", "user_about_me",
                 "user_relationships", "user_birthday", "user_location");
@@ -87,6 +85,7 @@ public class LoginFragment extends Fragment {
                 if (user == null) {
                     Log.d(getClass().getName(),
                             "Uh oh. The user cancelled the Facebook login");
+                    showProgress(false);
                 } else if (user.isNew()) {
                     Log.d(getClass().getName(),
                             "User signed up and logged in through Facebook!");
@@ -99,7 +98,6 @@ public class LoginFragment extends Fragment {
             }
         });
     }
-
     private void linkUser(final ParseUser user){
         ParseInstallation installation = ParseInstallation.getCurrentInstallation();
         installation.put("user", user);
@@ -119,7 +117,6 @@ public class LoginFragment extends Fragment {
         }
         getFacebookIdInBackground();
     }
-
     private void getFacebookIdInBackground() {
         Request.executeMeRequestAsync(ParseFacebookUtils.getSession(), new Request.GraphUserCallback() {
             @Override
@@ -132,7 +129,6 @@ public class LoginFragment extends Fragment {
             }
         });
     }
-
     private void showMainFragment(){
         getFragmentManager().beginTransaction().replace(R.id.container, new MainFragment())
                 .setCustomAnimations(R.animator.fade_in, R.animator.fade_out)

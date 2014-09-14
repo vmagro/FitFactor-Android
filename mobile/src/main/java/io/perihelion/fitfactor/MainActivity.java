@@ -13,13 +13,11 @@ import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Wearable;
 import com.parse.GetCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.PushService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,7 +32,7 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
 
     private final String TAG = this.getClass().getName();
     private GoogleApiClient mGoogleApiClient;
-    private List<OnBackPressedListener> onBackPressedListenerList;
+    private List<Callbacks> callbackList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +68,7 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
         }
 
         setContentView(R.layout.activity_main);
-        onBackPressedListenerList = new ArrayList<OnBackPressedListener>();
+        callbackList = new ArrayList<Callbacks>();
         getFragmentManager().beginTransaction().add(R.id.container, new LoginFragment()).commit();
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
@@ -151,6 +149,9 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
             stepCountUpdate.put("user", ParseUser.getCurrentUser());
             stepCountUpdate.saveInBackground();
 
+            for(Callbacks callbacks : callbackList)
+                callbacks.onStepCountUpdate(Integer.valueOf(jsonObject.getString("value")));
+
             Log.d(TAG, jsonObject.toString());
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -161,21 +162,21 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
 
     @Override
     public void onBackPressed() {
-        for(OnBackPressedListener onBackPressedListener : onBackPressedListenerList) {
-            if(onBackPressedListener.onBackPressed())
+        for(Callbacks callbacks : callbackList) {
+            if(callbacks.onBackPressed())
                 return;
         }
         super.onBackPressed();
 
     }
-
-    public void addOnBackPressedListener(OnBackPressedListener onBackPressedListener){
-        onBackPressedListenerList.add(onBackPressedListener);
+    public void addActivityCallbacks(Callbacks callbacks){
+        callbackList.add(callbacks);
     }
-    public void removeOnBackPressedListener(OnBackPressedListener onBackPressedListener){
-        onBackPressedListenerList.remove(onBackPressedListener);
+    public void removeActivityCallbacks(Callbacks callbacks){
+        callbackList.remove(callbacks);
     }
-    public interface OnBackPressedListener{
+    public interface Callbacks{
         public boolean onBackPressed();
+        public void onStepCountUpdate(int value);
     }
 }
