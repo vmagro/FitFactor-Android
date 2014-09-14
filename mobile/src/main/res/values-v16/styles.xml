@@ -37,11 +37,11 @@
 
 
     <style name="TextAppearance.FitFactor" parent="android:Widget.TextView">
-        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:fontFamily">sans-serif-condensed</item>
     </style>
 
     <style name="ButtonTextAppearance.FitFactor" parent="android:Widget.Holo.Button">
-        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:fontFamily">sans-serif-condensed</item>
     </style>
 
 </resources>
