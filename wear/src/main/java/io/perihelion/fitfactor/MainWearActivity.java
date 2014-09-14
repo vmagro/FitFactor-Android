@@ -42,6 +42,8 @@ public class MainWearActivity extends Activity implements SensorEventListener, G
     SensorManager mSensorManager;
     GoogleApiClient mGoogleApiClient;
 
+    private float stepCountOnLaunch = 0;
+    private boolean initialLaunchCountSaved = false;
     private float currentStepCount = 0;
 
     @Override
@@ -98,11 +100,18 @@ public class MainWearActivity extends Activity implements SensorEventListener, G
     public void onSensorChanged(SensorEvent sensorEvent) {
         Log.d(TAG, "sensor event: " + sensorEvent.sensor.getName() + " " + sensorEvent.accuracy + " = " + sensorEvent.values[0]);
         if (sensorEvent.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
-            mTextView.setText("" + (int) sensorEvent.values[0]);
-            float delta = sensorEvent.values[0] - currentStepCount;
-            currentStepCount = sensorEvent.values[0];
-            if (delta > 0) {
-                new SendMessageTask(sensorEvent.sensor.getName(), delta).execute();
+
+            if (!initialLaunchCountSaved) {
+                initialLaunchCountSaved = true;
+                stepCountOnLaunch = sensorEvent.values[0];
+                currentStepCount = stepCountOnLaunch;
+            } else {
+                mTextView.setText("" + (int) (sensorEvent.values[0] - stepCountOnLaunch));
+                float delta = sensorEvent.values[0] - currentStepCount;
+                currentStepCount = sensorEvent.values[0];
+                if (delta > 0) {
+                    new SendMessageTask(sensorEvent.sensor.getName(), delta).execute();
+                }
             }
         }
     }
