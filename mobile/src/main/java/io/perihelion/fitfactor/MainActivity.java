@@ -126,11 +126,14 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
                 try {
                     List<ParseObject> stepCounts = query.find();
                     for (ParseObject step : stepCounts) {
-                        step.deleteInBackground();
+                        step.deleteEventually();
                     }
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
+
+                for (Callbacks callbacks : callbackList)
+                    callbacks.onStepCountUpdate(0);
 
                 //send force reset
         }
