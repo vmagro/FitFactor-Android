@@ -4,4 +4,9 @@
         <item name="android:color">@android:color/black</item>
         <item name="android:textSize">35sp</item>
     </style>
+    <style name="FitFactor.Text.Info" parent="android:TextAppearance">
+        <item name="android:textSize">18dp</item>
+        <item name="android:maxWidth">225dp</item>
+        <item name="android:maxLines">3</item>
+    </style>
 </resources>

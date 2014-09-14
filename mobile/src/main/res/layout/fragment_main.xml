@@ -26,13 +26,9 @@
         android:layout_above="@+id/accountability"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginBottom="30dp"
-        android:paddingRight="10dp"
-        android:paddingLeft="10dp"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
+        android:layout_marginBottom="15dp"
+        style="@style/FitFactorBoxInfo"
         android:gravity="center"
-        android:background="@drawable/bkgrnd_blur_white"
         >
 
         <TextView
@@ -71,31 +67,26 @@
         android:textColor="@android:color/white"
         android:textSize="25sp"
         android:layout_marginBottom="10dp"
-        android:layout_above="@+id/accountable_container"
+        android:layout_above="@+id/accountant_container"
         android:layout_alignParentRight="true"
         />
 
     <LinearLayout
-        android:id="@+id/accountable_container"
+        android:id="@+id/accountant_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:layout_marginBottom="80dp"
+        android:layout_marginBottom="10dp"
+        android:layout_above="@+id/accountable_container"
+        style="@style/FitFactorBoxInfo"
         android:orientation="horizontal"
-        android:gravity="center_horizontal"
+        android:gravity="start|center_horizontal"
         android:clickable="true"
-        android:background="@drawable/bkgrnd_blur_white"
-        android:paddingRight="10dp"
-        android:paddingLeft="10dp"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
         >
         <com.facebook.widget.ProfilePictureView
-            android:id="@+id/main_prof"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:src="@drawable/ic_launcher"
+            android:id="@+id/accountant_pic"
+            android:layout_width="@dimen/account_pic_size"
+            android:layout_height="@dimen/account_pic_size"
             android:scaleType="centerCrop"
             />
         <LinearLayout
@@ -106,15 +97,48 @@
             android:layout_marginStart="10dp"
             >
             <TextView
-                android:id="@+id/accountable"
+                android:id="@+id/accountant_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="18dp"
-                android:maxWidth="250dp"
-                android:maxLines="3"
-                android:text="@string/format_accountable"/>
+                style="@style/FitFactor.Text.Info"
+                android:text="@string/accountant_null"/>
         </LinearLayout>
     </LinearLayout>
+    <LinearLayout
+        android:id="@+id/accountable_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="70dp"
+        style="@style/FitFactorBoxInfo"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal|end"
+        android:clickable="true"
+        >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/accountable_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:layout_marginEnd="10dp"
+                style="@style/FitFactor.Text.Info"
+                android:text="@string/accountable_null"
+                />
+        </LinearLayout>
+
+        <com.facebook.widget.ProfilePictureView
+            android:id="@+id/accountable_pic"
+            android:layout_width="@dimen/account_pic_size"
+            android:layout_height="@dimen/account_pic_size"
+            android:scaleType="centerCrop"/>
+    </LinearLayout>
+
+
     <ListView
         android:id="@+id/friendChooser"
         android:layout_width="match_parent"
