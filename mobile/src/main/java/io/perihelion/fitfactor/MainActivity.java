@@ -13,13 +13,11 @@ import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Wearable;
 import com.parse.GetCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.PushService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.perihelion.fitfactor.Fragments.LoginFragment;
+import io.perihelion.fitfactor.Fragments.MainFragment;
 
 public class MainActivity extends Activity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, MessageApi.MessageListener {
 
@@ -71,7 +70,8 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
 
         setContentView(R.layout.activity_main);
         callbackList = new ArrayList<Callbacks>();
-        getFragmentManager().beginTransaction().add(R.id.container, new LoginFragment()).commit();
+        getFragmentManager().beginTransaction().add(R.id.container,
+                ParseUser.getCurrentUser() == null ? new LoginFragment() : new MainFragment()).commit();
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
                 .addConnectionCallbacks(this)
