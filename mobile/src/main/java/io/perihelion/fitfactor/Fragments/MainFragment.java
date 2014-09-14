@@ -104,21 +104,19 @@ public class MainFragment extends Fragment implements MainActivity.Callbacks{
     }
     private void loadStats(final View view){
         //TODO: Get Stats from Parse
-        int percentCompleted = 25;
+        final int percentage = (int) Math.floor(((double)ParseUser.getCurrentUser().getInt("currentStepCount")/ParseUser.getCurrentUser().getInt("goal"))*100);
         String lockedString = "Locked";
-
-        /*((TextView) view.findViewById(R.id.main_final_goal)).setText(
-                String.format(getString(R.string.))
-        );*/
         ((TextView) view.findViewById(R.id.main_current_completed)).setText(
-                String.format(getString(R.string.format_goal_completed), percentCompleted)
+                String.format(getString(R.string.format_goal_completed), percentage)
         );
 
         ((TextView) view.findViewById(R.id.status)).setText(
                 String.format(getString(R.string.format_currently), lockedString)
         );
 
-        ((ProgressBar) view.findViewById(R.id.progressBar)).setProgress(percentCompleted);
+        ((ProgressBar) view.findViewById(R.id.progressBar)).setProgress(percentage);
+
+        ((TextView) view.findViewById(R.id.main_final_goal)).setText("Your goal is " + ParseUser.getCurrentUser().getInt("goal"));
     }
     private void showList(){
         final View list = getView().findViewById(R.id.friendChooser);
@@ -220,7 +218,6 @@ public class MainFragment extends Fragment implements MainActivity.Callbacks{
         if(isAdded()){
             final int percentage = (int) Math.floor(((double)value/ParseUser.getCurrentUser().getInt("goal"))*100);
             Log.d(getClass().getName(), "Goal: " + ParseUser.getCurrentUser().getInt("goal") + "\tCurrent: " + value + "\tPercentage: " + percentage);
-
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
