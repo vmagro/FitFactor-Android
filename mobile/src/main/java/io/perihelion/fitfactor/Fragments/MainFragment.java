@@ -218,12 +218,18 @@ public class MainFragment extends Fragment implements MainActivity.Callbacks{
     @Override
     public void onStepCountUpdate(int value) {
         if(isAdded()){
-            int percentage = (int) Math.floor(((double)value/ParseUser.getCurrentUser().getInt("goal"))*100);
+            final int percentage = (int) Math.floor(((double)value/ParseUser.getCurrentUser().getInt("goal"))*100);
             Log.d(getClass().getName(), "Goal: " + ParseUser.getCurrentUser().getInt("goal") + "\tCurrent: " + value + "\tPercentage: " + percentage);
-            ((ProgressBar)getView().findViewById(R.id.progressBar)).setProgress(percentage);
-            ((TextView) getView().findViewById(R.id.main_current_completed)).setText(
-                    String.format(getString(R.string.format_goal_completed), percentage)
-            );
+
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ((ProgressBar)getView().findViewById(R.id.progressBar)).setProgress(percentage);
+                    ((TextView) getView().findViewById(R.id.main_current_completed)).setText(
+                            String.format(getString(R.string.format_goal_completed), percentage)
+                    );
+                }
+            });
         }
     }
 

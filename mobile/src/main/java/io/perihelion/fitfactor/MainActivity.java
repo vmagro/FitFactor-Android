@@ -13,11 +13,13 @@ import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Wearable;
 import com.parse.GetCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.PushService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -105,6 +107,20 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        switch (id) {
+            case R.id.action_plus_goal:
+                int goal = ParseUser.getCurrentUser().getInt("goal");
+                ParseObject stepCountUpdate = new ParseObject("StepCountUpdate");
+                stepCountUpdate.put("value", goal);
+                stepCountUpdate.put("sensor", "Manual Trigger");
+                stepCountUpdate.put("user", ParseUser.getCurrentUser());
+                stepCountUpdate.saveInBackground();
+
+            case R.id.action_reset:
+
+                //send force reset
+        }
+
         //noinspection SimplifiableIfStatement
 
 
@@ -150,7 +166,7 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
             stepCountUpdate.saveInBackground();
 
             for(Callbacks callbacks : callbackList)
-                callbacks.onStepCountUpdate(Integer.valueOf(jsonObject.getString("value")));
+                callbacks.onStepCountUpdate(Float.valueOf(jsonObject.getString("value")).intValue());
 
             Log.d(TAG, jsonObject.toString());
         } catch (UnsupportedEncodingException e) {

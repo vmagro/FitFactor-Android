@@ -6,12 +6,8 @@
         android:title="Reset"
         android:orderInCategory="100"
         android:showAsAction="never" />
-    <item android:id="@+id/action_lock"
-        android:title="Lock"
-        android:orderInCategory="100"
-        android:showAsAction="never" />
-    <item android:id="@+id/action_unlock"
-        android:title="Unlock"
+    <item android:id="@+id/action_plus_goal"
+        android:title="+Goal"
         android:orderInCategory="100"
         android:showAsAction="never" />
 </menu>
